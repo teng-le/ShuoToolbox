@@ -1,0 +1,11 @@
+bin/
+obj/
+.vs/
+*.user
+*.suo
+
+# Everything 的本机索引和搜索历史，不该进仓库
+Tools/Everything/*.db
+Tools/Everything/*.ini
+Tools/Everything/*.csv
+Tools/Everything/*.json

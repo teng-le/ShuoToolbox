@@ -1,0 +1,30 @@
+{
+  "categories": [
+    {
+      "name": "文本工具",
+      "tools": [
+        { "name": "记事本", "path": "notepad.exe" }
+      ]
+    },
+    {
+      "name": "计算工具",
+      "tools": [
+        { "name": "计算器", "path": "calc.exe" }
+      ]
+    },
+    {
+      "name": "图形工具",
+      "tools": [
+        { "name": "画图", "path": "mspaint.exe" }
+      ]
+    },
+    {
+      "name": "系统工具",
+      "tools": [
+        { "name": "命令提示符", "path": "cmd.exe" },
+        { "name": "管理员 CMD", "path": "Tools\\AdminCmd\\cmd-admin.exe" },
+        { "name": "Everything", "path": "Tools\\Everything\\Everything64.exe" }
+      ]
+    }
+  ]
+}
