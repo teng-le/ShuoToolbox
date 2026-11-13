@@ -1,57 +1,119 @@
 {
-  "categories": [
+  "Categories": [
     {
-      "name": "文本工具",
-      "tools": [
+      "Name": "系统快捷工具",
+      "Icon": "⚡",
+      "Tools": [
         {
-          "name": "记事本",
-          "description": "Windows 自带的纯文本编辑器，用于快速查看和编辑 txt、log 等文本文件。",
-          "path": "notepad.exe"
+          "Name": "记事本",
+          "Description": "Windows 记事本",
+          "Icon": "📄",
+          "Path": "notepad.exe",
+          "Arguments": "",
+          "WorkingDirectory": "",
+          "RunAsAdmin": false
+        },
+        {
+          "Name": "计算器",
+          "Description": "Windows 计算器",
+          "Icon": "🧮",
+          "Path": "calc.exe",
+          "Arguments": "",
+          "WorkingDirectory": "",
+          "RunAsAdmin": false
+        },
+        {
+          "Name": "画图",
+          "Description": "Windows 画图",
+          "Icon": "🖌️",
+          "Path": "mspaint.exe",
+          "Arguments": "",
+          "WorkingDirectory": "",
+          "RunAsAdmin": false
+        },
+        {
+          "Name": "截图工具",
+          "Description": "Windows 截图工具",
+          "Icon": "✂️",
+          "Path": "C:\\Windows\\System32\\SnippingTool.exe",
+          "Arguments": "",
+          "WorkingDirectory": "",
+          "RunAsAdmin": false
+        },
+        {
+          "Name": "Everything",
+          "Description": "极速文件搜索",
+          "Icon": "🔍",
+          "Path": "Tools\\Everything\\Everything64.exe",
+          "Arguments": "",
+          "WorkingDirectory": "Tools\\Everything",
+          "RunAsAdmin": false
+        },
+        {
+          "Name": "SpaceSniffer",
+          "Description": "磁盘空间可视化分析",
+          "Icon": "📊",
+          "Path": "Tools\\SpaceSniffer\\SpaceSniffer.exe",
+          "Arguments": "",
+          "WorkingDirectory": "Tools\\SpaceSniffer",
+          "RunAsAdmin": false
+        },
+        {
+          "Name": "Geek Uninstaller",
+          "Description": "轻量极速的强力软件卸载工具",
+          "Icon": "🗑️",
+          "Path": "Tools\\Geek\\geek.exe",
+          "Arguments": "",
+          "WorkingDirectory": "Tools\\Geek",
+          "RunAsAdmin": true
+        },
+        {
+          "Name": "NDM",
+          "Description": "Neat Download Manager 轻量下载工具",
+          "Icon": "📥",
+          "Path": "Tools\\NDM\\NeatDM.exe",
+          "Arguments": "",
+          "WorkingDirectory": "Tools\\NDM",
+          "RunAsAdmin": false
         }
       ]
     },
     {
-      "name": "计算工具",
-      "tools": [
+      "Name": "系统调试",
+      "Icon": "🛠️",
+      "Tools": [
         {
-          "name": "计算器",
-          "description": "Windows 自带计算器，支持标准、科学、程序员等多种模式。",
-          "path": "calc.exe"
+          "Name": "管理员CMD",
+          "Description": "以管理员身份打开命令提示符",
+          "Icon": "⌨️",
+          "Path": "Tools\\AdminCmd\\cmd-admin.exe",
+          "Arguments": "",
+          "WorkingDirectory": "Tools\\AdminCmd",
+          "RunAsAdmin": true
+        },
+        {
+          "Name": "Dism++",
+          "Description": "系统维护与映像管理",
+          "Icon": "🧰",
+          "Path": "Tools\\Dism++\\Dism++x64.exe",
+          "Arguments": "",
+          "WorkingDirectory": "Tools\\Dism++",
+          "RunAsAdmin": true
         }
       ]
     },
     {
-      "name": "图形工具",
-      "tools": [
+      "Name": "手机工具",
+      "Icon": "📱",
+      "Tools": [
         {
-          "name": "画图",
-          "description": "Windows 自带绘图工具，可进行简单的图片查看、裁剪和涂鸦。",
-          "path": "mspaint.exe"
-        }
-      ]
-    },
-    {
-      "name": "系统工具",
-      "tools": [
-        {
-          "name": "命令提示符",
-          "description": "Windows 自带的命令提示符（cmd），用于执行命令行操作。",
-          "path": "cmd.exe"
-        },
-        {
-          "name": "管理员 CMD",
-          "description": "带时间戳提示符和版本横幅的自定义命令提示符，以管理员权限运行。",
-          "path": "Tools\\AdminCmd\\cmd-admin.exe"
-        },
-        {
-          "name": "Everything",
-          "description": "极速文件搜索工具，可瞬间搜索本机所有文件和文件夹，替代 Windows 自带搜索。",
-          "path": "Tools\\Everything\\Everything64.exe"
-        },
-        {
-          "name": "SpaceSniffer",
-          "description": "磁盘空间可视化分析工具，用方块图直观显示哪些文件夹占用了最多空间。",
-          "path": "Tools\\SpaceSniffer\\SpaceSniffer.exe"
+          "Name": "QtScrcpy",
+          "Description": "安卓投屏与设备控制，内置 adb",
+          "Icon": "📲",
+          "Path": "Tools\\QtScrcpy\\QtScrcpy.exe",
+          "Arguments": "",
+          "WorkingDirectory": "Tools\\QtScrcpy",
+          "RunAsAdmin": false
         }
       ]
     }

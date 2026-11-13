@@ -1,0 +1,8 @@
+先安装官方原版NeatDownloadManager 
+官方下载地址：https://www.neatdownloadmanager.com/file/NeatDM_setup.exe
+
+( 默认官方安装目录是 C:\Program Files (x86)\Neat Download Manager )
+然后把NeatDM.exe这个文件复制到安装目录替换就行了。
+
+
+
