@@ -12,7 +12,7 @@ namespace Toolbox
     public partial class Form1 : Form
     {
         private const string HardwareInfoCategory = "硬件信息";
-        private const string AppVersion = "v0.3.0";
+        private const string AppVersion = "v0.3.2";
         private const int TitleBarHeight = 36;
         private const int WindowCornerRadius = 6;
         private const int ResizeBorder = 8;
@@ -79,6 +79,25 @@ namespace Toolbox
             categoryList.SelectedIndexChanged += CategoryList_SelectedIndexChanged;
             leftPanel.Controls.Add(categoryList);
 
+            // --- 新增的切换按钮（搞机工具箱占位） ---
+            var phoneModeButton = new Button();
+            phoneModeButton.Text = "📱 切换搞机模式";
+            phoneModeButton.Dock = DockStyle.Bottom;
+            phoneModeButton.Height = 44;
+            phoneModeButton.FlatStyle = FlatStyle.Flat;
+            phoneModeButton.FlatAppearance.BorderSize = 0;
+            phoneModeButton.BackColor = Color.FromArgb(225, 225, 225); // 稍微深一点的灰色，突出显示
+            phoneModeButton.ForeColor = Color.FromArgb(0, 102, 204);   // 蓝色字体，表示这是可点击的切换
+            phoneModeButton.Font = new Font("微软雅黑", 9.5F, FontStyle.Bold);
+            phoneModeButton.Cursor = Cursors.Hand;
+            phoneModeButton.Click += (s, e) =>
+            {
+                MessageBox.Show("搞机工具箱功能开发中...\n未来将在此处连接 ADB 并直接拉起。", "提示", 
+                    MessageBoxButtons.OK, MessageBoxIcon.Information);
+            };
+            leftPanel.Controls.Add(phoneModeButton);
+            // ---------------------------------------
+
             var versionLabel = new Label();
             versionLabel.Text = AppVersion;
             versionLabel.Font = new Font("微软雅黑", 8.5F);
@@ -115,7 +134,7 @@ namespace Toolbox
             settingsButton = CreateTitleBarButton("⚙", Color.FromArgb(230, 230, 230), Color.FromArgb(60, 60, 60));
             settingsButton.Click += (s, e) =>
             {
-                MessageBox.Show("设置功能尚未实现，敬请期待。", "设置",
+                MessageBox.Show("工具箱设置面板开发中，敬请期待。", "设置",
                     MessageBoxButtons.OK, MessageBoxIcon.Information);
             };
 
