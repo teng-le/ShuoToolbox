@@ -43,7 +43,6 @@ namespace Toolbox
         }
     }
 
-    // 圆角卡片容器
     public class CardPanel : Panel
     {
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
@@ -92,8 +91,10 @@ namespace Toolbox
     public partial class Form1 : Form
     {
         private const string HardwareInfoCategory = "硬件信息";
-        private const string AppVersion = "v0.1.0";
-        private const int WindowCornerRadius = 8;
+        private const string AppVersion = "v0.2.0-dev";
+        private const int TitleBarHeight = 36;
+        private const int WindowCornerRadius = 6;
+        private const int ResizeBorder = 8;
 
         [DllImport("gdi32.dll")]
         private static extern IntPtr CreateRoundRectRgn(int nLeftRect, int nTopRect,
@@ -112,6 +113,11 @@ namespace Toolbox
         private ListBox categoryList = null!;
         private Label descLabel = null!;
 
+        private Button? settingsButton;
+        private Button? minimizeButton;
+        private Button? maximizeButton;
+        private Button? closeButton;
+
         private Button? selectedButton;
         private Button? lastClickedButton;
         private DateTime lastClickTime = DateTime.MinValue;
@@ -123,9 +129,12 @@ namespace Toolbox
             InitializeComponent();
             configPath = Path.Combine(baseDir, "tools.json");
 
-            this.Text = "工具箱";
+            this.FormBorderStyle = FormBorderStyle.None;
+            this.Text = "硕のtoolbox";
             this.Size = new Size(880, 640);
             this.StartPosition = FormStartPosition.CenterScreen;
+            this.Padding = new Padding(0, TitleBarHeight, 0, 0);
+            this.DoubleBuffered = true;
 
             contentHost = new Panel();
             contentHost.Dock = DockStyle.Fill;
@@ -142,7 +151,6 @@ namespace Toolbox
             descLabel.Text = "单击工具查看说明，双击打开工具。";
             this.Controls.Add(descLabel);
 
-            // 左侧栏容器：上方 ListBox + 底部设置按钮 + 底部版本号
             var leftPanel = new Panel();
             leftPanel.Dock = DockStyle.Left;
             leftPanel.Width = 170;
@@ -157,48 +165,113 @@ namespace Toolbox
             categoryList.SelectedIndexChanged += CategoryList_SelectedIndexChanged;
             leftPanel.Controls.Add(categoryList);
 
-            var settingsButton = new Button();
-            settingsButton.Text = "⚙";
-            settingsButton.Font = new Font("Segoe UI Symbol", 12F);
-            settingsButton.FlatStyle = FlatStyle.Flat;
-            settingsButton.FlatAppearance.BorderSize = 0;
-            settingsButton.ForeColor = Color.FromArgb(110, 110, 110);
-            settingsButton.BackColor = Color.FromArgb(235, 235, 235);
-            settingsButton.Dock = DockStyle.Bottom;
-            settingsButton.Height = 34;
-            settingsButton.Cursor = Cursors.Hand;
-            settingsButton.Click += (s, e) =>
-            {
-                MessageBox.Show("设置功能尚未实现，敬请期待。", "设置",
-                    MessageBoxButtons.OK, MessageBoxIcon.Information);
-            };
-            leftPanel.Controls.Add(settingsButton);
-
             var versionLabel = new Label();
             versionLabel.Text = AppVersion;
             versionLabel.Font = new Font("微软雅黑", 8.5F);
-            versionLabel.ForeColor = Color.FromArgb(160, 160, 160);
+            versionLabel.ForeColor = Color.FromArgb(140, 140, 140);
             versionLabel.BackColor = Color.FromArgb(235, 235, 235);
             versionLabel.TextAlign = ContentAlignment.MiddleCenter;
             versionLabel.Dock = DockStyle.Bottom;
-            versionLabel.Height = 22;
+            versionLabel.Height = 24;
             leftPanel.Controls.Add(versionLabel);
 
+            BuildTitleBarButtons();
             BuildToolPanel();
             BuildHardwarePanel();
 
             LoadConfig();
         }
 
-        protected override void OnHandleCreated(EventArgs e)
+        private void BuildTitleBarButtons()
         {
-            base.OnHandleCreated(e);
-            ApplyWindowRegion();
+            closeButton = CreateTitleBarButton("✕", Color.FromArgb(232, 17, 35), Color.White);
+            closeButton.Click += (s, e) => Close();
+
+            maximizeButton = CreateTitleBarButton("□", Color.FromArgb(230, 230, 230), Color.FromArgb(60, 60, 60));
+            maximizeButton.Click += (s, e) =>
+            {
+                WindowState = WindowState == FormWindowState.Maximized
+                    ? FormWindowState.Normal
+                    : FormWindowState.Maximized;
+            };
+
+            minimizeButton = CreateTitleBarButton("—", Color.FromArgb(230, 230, 230), Color.FromArgb(60, 60, 60));
+            minimizeButton.Click += (s, e) => WindowState = FormWindowState.Minimized;
+
+            settingsButton = CreateTitleBarButton("⚙", Color.FromArgb(230, 230, 230), Color.FromArgb(60, 60, 60));
+            settingsButton.Click += (s, e) =>
+            {
+                MessageBox.Show("设置功能尚未实现，敬请期待。", "设置",
+                    MessageBoxButtons.OK, MessageBoxIcon.Information);
+            };
+
+            this.Controls.Add(closeButton);
+            this.Controls.Add(maximizeButton);
+            this.Controls.Add(minimizeButton);
+            this.Controls.Add(settingsButton);
+
+            RepositionTitleBarButtons();
+        }
+
+        private Button CreateTitleBarButton(string text, Color hoverBack, Color hoverFore)
+        {
+            var btn = new Button();
+            btn.Text = text;
+            btn.FlatStyle = FlatStyle.Flat;
+            btn.FlatAppearance.BorderSize = 0;
+            btn.FlatAppearance.MouseOverBackColor = Color.Transparent;
+            btn.FlatAppearance.MouseDownBackColor = Color.Transparent;
+            btn.BackColor = Color.FromArgb(250, 250, 250);
+            btn.ForeColor = Color.FromArgb(80, 80, 80);
+            btn.Font = new Font("Segoe UI Symbol", 10F);
+            btn.Size = new Size(40, TitleBarHeight);
+            btn.Cursor = Cursors.Hand;
+            btn.TabStop = false;
+            btn.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+
+            btn.MouseEnter += (s, e) => { btn.BackColor = hoverBack; btn.ForeColor = hoverFore; };
+            btn.MouseLeave += (s, e) =>
+            {
+                btn.BackColor = Color.FromArgb(250, 250, 250);
+                btn.ForeColor = Color.FromArgb(80, 80, 80);
+            };
+
+            return btn;
+        }
+
+        private void RepositionTitleBarButtons()
+        {
+            if (closeButton == null || maximizeButton == null || minimizeButton == null || settingsButton == null) return;
+
+            int right = ClientSize.Width;
+            closeButton.Location = new Point(right - 40, 0);
+            maximizeButton.Location = new Point(right - 80, 0);
+            minimizeButton.Location = new Point(right - 120, 0);
+            settingsButton.Location = new Point(right - 160, 0);
+        }
+
+        protected override void OnLoad(EventArgs e)
+        {
+            base.OnLoad(e);
+            MaximizedBounds = Screen.FromControl(this).WorkingArea;
+            RepositionTitleBarButtons();
         }
 
         protected override void OnResize(EventArgs e)
         {
             base.OnResize(e);
+            ApplyWindowRegion();
+            RepositionTitleBarButtons();
+
+            if (maximizeButton != null)
+            {
+                maximizeButton.Text = WindowState == FormWindowState.Maximized ? "❐" : "□";
+            }
+        }
+
+        protected override void OnHandleCreated(EventArgs e)
+        {
+            base.OnHandleCreated(e);
             ApplyWindowRegion();
         }
 
@@ -218,6 +291,78 @@ namespace Toolbox
             {
                 SetWindowRgn(Handle, rgn, true);
             }
+        }
+
+        protected override void OnPaint(PaintEventArgs e)
+        {
+            base.OnPaint(e);
+
+            using var brush = new SolidBrush(Color.FromArgb(250, 250, 250));
+            e.Graphics.FillRectangle(brush, 0, 0, ClientSize.Width, TitleBarHeight);
+
+            using var font = new Font("微软雅黑", 11F, FontStyle.Bold);
+            using var textBrush = new SolidBrush(Color.FromArgb(50, 50, 50));
+            var textRect = new Rectangle(16, 0, ClientSize.Width - 200, TitleBarHeight);
+            var sf = new StringFormat
+            {
+                LineAlignment = StringAlignment.Center,
+                Alignment = StringAlignment.Near
+            };
+            e.Graphics.DrawString("硕のtoolbox", font, textBrush, textRect, sf);
+
+            using var pen = new Pen(Color.FromArgb(220, 220, 220), 1);
+            e.Graphics.DrawLine(pen, 0, TitleBarHeight - 1, ClientSize.Width, TitleBarHeight - 1);
+        }
+
+        protected override void WndProc(ref Message m)
+        {
+            const int WM_NCHITTEST = 0x0084;
+            const int HTCLIENT = 1;
+            const int HTCAPTION = 2;
+            const int HTLEFT = 10;
+            const int HTRIGHT = 11;
+            const int HTTOP = 12;
+            const int HTTOPLEFT = 13;
+            const int HTTOPRIGHT = 14;
+            const int HTBOTTOM = 15;
+            const int HTBOTTOMLEFT = 16;
+            const int HTBOTTOMRIGHT = 17;
+
+            base.WndProc(ref m);
+
+            if (m.Msg != WM_NCHITTEST) return;
+
+            int raw = m.LParam.ToInt32();
+            int sx = (short)(raw & 0xFFFF);
+            int sy = (short)((raw >> 16) & 0xFFFF);
+            Point pos = PointToClient(new Point(sx, sy));
+
+            if (WindowState == FormWindowState.Maximized)
+            {
+                m.Result = pos.Y <= TitleBarHeight ? (IntPtr)HTCAPTION : (IntPtr)HTCLIENT;
+                return;
+            }
+
+            int w = ClientSize.Width;
+            int h = ClientSize.Height;
+            int b = ResizeBorder;
+
+            if (pos.X <= b && pos.Y <= b) { m.Result = (IntPtr)HTTOPLEFT; return; }
+            if (pos.X >= w - b && pos.Y <= b) { m.Result = (IntPtr)HTTOPRIGHT; return; }
+            if (pos.X <= b && pos.Y >= h - b) { m.Result = (IntPtr)HTBOTTOMLEFT; return; }
+            if (pos.X >= w - b && pos.Y >= h - b) { m.Result = (IntPtr)HTBOTTOMRIGHT; return; }
+            if (pos.X <= b) { m.Result = (IntPtr)HTLEFT; return; }
+            if (pos.X >= w - b) { m.Result = (IntPtr)HTRIGHT; return; }
+            if (pos.Y <= b) { m.Result = (IntPtr)HTTOP; return; }
+            if (pos.Y >= h - b) { m.Result = (IntPtr)HTBOTTOM; return; }
+
+            if (pos.Y <= TitleBarHeight)
+            {
+                m.Result = (IntPtr)HTCAPTION;
+                return;
+            }
+
+            m.Result = (IntPtr)HTCLIENT;
         }
 
         private void BuildToolPanel()

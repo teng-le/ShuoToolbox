@@ -1,16 +1,45 @@
-namespace Toolbox;
+using System;
+using System.IO;
+using System.Windows.Forms;
 
-static class Program
+namespace Toolbox
 {
-    /// <summary>
-    ///  The main entry point for the application.
-    /// </summary>
-    [STAThread]
-    static void Main()
+    internal static class Program
     {
-        // To customize application configuration such as set high DPI settings or default font,
-        // see https://aka.ms/applicationconfiguration.
-        ApplicationConfiguration.Initialize();
-        Application.Run(new Form1());
-    }    
+        [STAThread]
+        static void Main()
+        {
+            ApplicationConfiguration.Initialize();
+
+            Application.ThreadException += (s, e) => ShowException(e.Exception);
+            AppDomain.CurrentDomain.UnhandledException += (s, e) =>
+            {
+                if (e.ExceptionObject is Exception ex)
+                {
+                    ShowException(ex);
+                }
+            };
+
+            try
+            {
+                Application.Run(new Form1());
+            }
+            catch (Exception ex)
+            {
+                ShowException(ex);
+            }
+        }
+
+        private static void ShowException(Exception ex)
+        {
+            try
+            {
+                string log = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "error.log");
+                File.WriteAllText(log, DateTime.Now + "\r\n" + ex.ToString());
+            }
+            catch { }
+
+            MessageBox.Show(ex.ToString(), "程序崩溃", MessageBoxButtons.OK, MessageBoxIcon.Error);
+        }
+    }
 }
