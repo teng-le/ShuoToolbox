@@ -12,7 +12,24 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="Tools\**\*" CopyToOutputDirectory="PreserveNewest" />
-    <None Include="tools.json" CopyToOutputDirectory="PreserveNewest" />
+    <PackageReference Include="System.Management" Version="10.0.0" />
   </ItemGroup>
+
+  <ItemGroup>
+    <None Update="tools.json" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+  </ItemGroup>
+
+  <Target Name="CopyToolsToOutput" AfterTargets="Build">
+    <ItemGroup>
+      <ToolsForOutput Include="$(MSBuildProjectDirectory)\Tools\**\*" />
+    </ItemGroup>
+    <Copy SourceFiles="@(ToolsForOutput)" DestinationFiles="@(ToolsForOutput->'$(OutputPath)Tools\%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" />
+  </Target>
+
+  <Target Name="CopyToolsToPublish" AfterTargets="Publish">
+    <ItemGroup>
+      <ToolsForPublish Include="$(MSBuildProjectDirectory)\Tools\**\*" />
+    </ItemGroup>
+    <Copy SourceFiles="@(ToolsForPublish)" DestinationFiles="@(ToolsForPublish->'$(PublishDir)Tools\%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" />
+  </Target>
 </Project>
