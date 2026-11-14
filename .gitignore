@@ -9,3 +9,5 @@ Tools/Everything/*.db
 Tools/Everything/*.ini
 Tools/Everything/*.csv
 Tools/Everything/*.json
+# GeekFlashTool - third-party tool, distributed via Lanzou cloud, not in Git
+Tools/GeekFlashTool/
