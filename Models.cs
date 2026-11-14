@@ -6,12 +6,17 @@ namespace Toolbox
     {
         public string Name { get; set; } = "";
         public string Description { get; set; } = "";
+        public string Icon { get; set; } = "";
         public string Path { get; set; } = "";
+        public string Arguments { get; set; } = "";
+        public string WorkingDirectory { get; set; } = "";
+        public bool RunAsAdmin { get; set; } = false;
     }
 
     public class CategoryItem
     {
         public string Name { get; set; } = "";
+        public string Icon { get; set; } = "";
         public List<ToolItem> Tools { get; set; } = new();
     }
 

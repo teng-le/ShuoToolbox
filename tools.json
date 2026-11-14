@@ -1,7 +1,7 @@
 {
   "Categories": [
     {
-      "Name": "系统快捷工具",
+      "Name": "系统快捷",
       "Icon": "⚡",
       "Tools": [
         {
@@ -39,7 +39,13 @@
           "Arguments": "",
           "WorkingDirectory": "",
           "RunAsAdmin": false
-        },
+        }
+      ]
+    },
+    {
+      "Name": "便捷工具",
+      "Icon": "🚀",
+      "Tools": [
         {
           "Name": "Everything",
           "Description": "极速文件搜索",
