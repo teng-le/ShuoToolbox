@@ -12,7 +12,7 @@ namespace Toolbox
     public partial class Form1 : Form
     {
         private const string HardwareInfoCategory = "硬件信息";
-        private const string AppVersion = "v0.3.6";
+        private const string AppVersion = "v0.4.0";
         private const int TitleBarHeight = 36;
         private const int WindowCornerRadius = 6;
         private const int ResizeBorder = 8;
@@ -38,8 +38,16 @@ namespace Toolbox
         private ToolboxConfig config = new();
         private bool hardwareLoaded = false;
 
+        // --- 托盘相关变量 ---
+        private NotifyIcon? trayIcon;
+        private ContextMenuStrip? trayMenu;
+        private bool isExit = false;
+        private AppSettings currentSettings;
+
         public Form1()
         {
+            currentSettings = AppSettings.Load();
+
             InitializeComponent();
             configPath = Path.Combine(baseDir, "tools.json");
 
@@ -110,13 +118,78 @@ namespace Toolbox
             BuildToolPanel();
             BuildHardwarePanel();
 
+            if (currentSettings.StartMinimized)
+            {
+                InitializeTray();
+            }
+
             LoadConfig();
+        }
+
+        private void InitializeTray()
+        {
+            trayMenu = new ContextMenuStrip();
+            trayMenu.Items.Add("显示主界面", null, (s, e) => ShowMainForm());
+            trayMenu.Items.Add("退出", null, (s, e) => ExitApplication());
+
+            trayIcon = new NotifyIcon();
+            trayIcon.Text = "硕のtoolbox";
+            try
+            {
+                trayIcon.Icon = Icon.ExtractAssociatedIcon(Application.ExecutablePath);
+            }
+            catch
+            {
+                trayIcon.Icon = SystemIcons.Application;
+            }
+            trayIcon.ContextMenuStrip = trayMenu;
+            trayIcon.Visible = true;
+            trayIcon.DoubleClick += (s, e) => ShowMainForm();
+        }
+
+        private void ShowMainForm()
+        {
+            this.Show();
+            this.WindowState = FormWindowState.Normal;
+            this.Activate();
+        }
+
+        private void ExitApplication()
+        {
+            isExit = true;
+            if (trayIcon != null) trayIcon.Visible = false;
+            Application.Exit();
+        }
+
+        protected override void OnFormClosing(FormClosingEventArgs e)
+        {
+            if (isExit || e.CloseReason == CloseReason.WindowsShutDown)
+            {
+                base.OnFormClosing(e);
+                return;
+            }
+
+            if (e.CloseReason == CloseReason.UserClosing)
+            {
+                if (trayIcon != null)
+                {
+                    e.Cancel = true;
+                    this.Hide();
+                    trayIcon.ShowBalloonTip(2000, "硕のtoolbox", "程序已最小化到托盘后台运行", ToolTipIcon.Info);
+                }
+                else
+                {
+                    isExit = true;
+                    Application.Exit();
+                }
+            }
+            base.OnFormClosing(e);
         }
 
         private void BuildTitleBarButtons()
         {
             closeButton = CreateTitleBarButton("✕", Color.FromArgb(232, 17, 35), Color.White);
-            closeButton.Click += (s, e) => Close();
+            closeButton.Click += (s, e) => Close(); 
 
             maximizeButton = CreateTitleBarButton("□", Color.FromArgb(230, 230, 230), Color.FromArgb(60, 60, 60));
             maximizeButton.Click += (s, e) =>
@@ -132,8 +205,8 @@ namespace Toolbox
             settingsButton = CreateTitleBarButton("⚙", Color.FromArgb(230, 230, 230), Color.FromArgb(60, 60, 60));
             settingsButton.Click += (s, e) =>
             {
-                MessageBox.Show("工具箱设置面板开发中，敬请期待。", "设置",
-                    MessageBoxButtons.OK, MessageBoxIcon.Information);
+                using var settingsForm = new SettingsForm();
+                settingsForm.ShowDialog(this);
             };
 
             this.Controls.Add(closeButton);
@@ -444,8 +517,6 @@ namespace Toolbox
                 }
                 catch { }
 
-                string path = tool.Path;
-                string name = tool.Name;
                 string description = tool.Description;
 
                 btn.MouseDown += (s, e) =>
@@ -458,14 +529,14 @@ namespace Toolbox
                     {
                         lastClickedButton = null;
                         lastClickTime = DateTime.MinValue;
-                        Launch(path);
+                        Launch(tool);
                     }
                     else
                     {
                         lastClickedButton = btn;
                         lastClickTime = now;
                         SelectButton(btn);
-                        ShowDescription(name, description);
+                        ShowDescription(tool.Name, description);
                     }
                 };
 
@@ -617,30 +688,48 @@ namespace Toolbox
 
         private string ResolvePath(string path)
         {
+            if (string.IsNullOrEmpty(path)) return "";
             if (Path.IsPathRooted(path)) return path;
+            
             string toolboxPath = Path.Combine(baseDir, path);
-            if (File.Exists(toolboxPath)) return toolboxPath;
+            if (File.Exists(toolboxPath) || Directory.Exists(toolboxPath)) return toolboxPath;
+            
             string sysPath = Path.Combine(Environment.SystemDirectory, path);
             if (File.Exists(sysPath)) return sysPath;
+            
             return toolboxPath;
         }
 
-        private void Launch(string path)
+        private void Launch(ToolItem tool)
         {
-            string fullPath = ResolvePath(path);
-            if (File.Exists(fullPath))
-            {
-                Process.Start(new ProcessStartInfo
-                {
-                    FileName = fullPath,
-                    WorkingDirectory = Path.GetDirectoryName(fullPath) ?? baseDir,
-                    UseShellExecute = true
-                });
-            }
-            else
+            string fullPath = ResolvePath(tool.Path);
+            if (!File.Exists(fullPath))
             {
                 MessageBox.Show("找不到工具文件：\n" + fullPath,
                     "启动失败", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            string workDir = string.IsNullOrEmpty(tool.WorkingDirectory)
+                ? Path.GetDirectoryName(fullPath) ?? baseDir
+                : ResolvePath(tool.WorkingDirectory);
+
+            try
+            {
+                ProcessStartInfo psi = new ProcessStartInfo
+                {
+                    FileName = fullPath,
+                    Arguments = tool.Arguments ?? "",
+                    WorkingDirectory = workDir,
+                    UseShellExecute = true,
+                    Verb = tool.RunAsAdmin ? "runas" : ""
+                };
+
+                Process.Start(psi);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("启动失败：" + ex.Message, "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
     }
