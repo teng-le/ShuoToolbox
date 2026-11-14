@@ -17,7 +17,7 @@
 
 ## 📂 核心文件结构与职责
 - `Program.cs`：程序入口。包含全局异常捕获（`Application.ThreadException`），崩溃时写 `error.log` 防止无提示闪退。
-- `Form1.cs`：主界面。无边框拖拽（`WM_NCHITTEST` 找回 Aero Snap）、自定义标题栏、左侧分类菜单、工具卡片渲染（手动双击判定）、工具启动逻辑（绝对路径解析 + UAC提权）、窗口最小尺寸限制、硬件信息面板及导出逻辑。
+- `Form1.cs`：主界面。无边框拖拽（`WM_NCHITTEST` 找回 Aero Snap）、自定义标题栏、左侧分类菜单、工具卡片渲染（手动双击判定）、工具启动逻辑（绝对路径解析 + UAC 提权）、窗口最小尺寸限制、硬件信息面板及导出逻辑。
 - `SettingsForm.cs`：设置面板。包含常规页/更新页切换、防误点拦截、开机自启等。
 - `AppSettings.cs`：配置存取类。负责读写 `settings.json`（主题、开机自启、托盘状态等）。
 - `Models.cs`：数据模型。`ToolItem`（包含 Name, Description, Icon, Path, Arguments, WorkingDirectory, RunAsAdmin），`CategoryItem`，`HardwareCard`。
@@ -43,9 +43,9 @@
 - **窗口尺寸自锁**：曾因无最小尺寸限制，窗口被拉成负数导致不可见且无法关闭。已通过 `MinimumSize` 和 `OnResize` 兜底修复。
 - **刷机匣闪退**：因 `move` 命令漏搬 `Binaries` 目录，导致启动找不到 `Mtk\Loaders` 抛未捕获异常闪退。现已补全资源包。
 - **GitHub 推送超时**：国内网络环境 HTTPS/SSH 均易被阻断，push 常卡死。建议使用 Watt Toolkit 加速，或直接通过网页端 Upload files。
-- **小黄鸭（LosslessScaling）**：因路径写死导致更换文件夹失效，已移除，不再追求绝对路径。
+- **小黄鸭 (LosslessScaling)**：因路径写死导致更换文件夹失效，已移除，不再追求绝对路径。
 - **加工具原则**：不要乱加工具，一次只加一个，跑通测试后再加下一个。
 
 ---
-##AI太好用了
-太好用了，我做个导演就行了，本项目99%是AI写的（这一条也是）只不过这一条是我让AI加的
+## AI太好用了
+太好用了，我做个导演就行了，本项目 99% 是 AI 写的（这一条也是）只不过这一条是我让 AI 加的
