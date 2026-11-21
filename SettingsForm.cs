@@ -21,9 +21,12 @@ namespace Toolbox
         private ComboBox themeCombo = null!;
         private CheckBox autoStartCheck = null!;
         private CheckBox startMinCheck = null!;
+        private CheckBox vsyncCheck = null!; // 新增
         
         private Button saveBtn = null!;
         private Button cancelBtn = null!;
+
+        private bool IsDarkMode => settings.Theme == "Dark";
 
         public SettingsForm()
         {
@@ -35,22 +38,16 @@ namespace Toolbox
         private void InitializeUI()
         {
             this.FormBorderStyle = FormBorderStyle.None;
-            this.Size = new Size(600, 420);
+            this.Size = new Size(600, 460); // 稍微加高一点放新设置
             this.StartPosition = FormStartPosition.CenterParent;
-            this.BackColor = Color.FromArgb(250, 250, 250);
+            this.BackColor = IsDarkMode ? Color.FromArgb(30, 30, 30) : Color.FromArgb(250, 250, 250);
             this.DoubleBuffered = true;
 
-            // ==========================================
-            // 核心修复：严格按照从底层到顶层的顺序添加控件
-            // ==========================================
-
-            // 1. 先加填充区（Fill）
-            contentHost = new Panel { Dock = DockStyle.Fill, BackColor = Color.FromArgb(250, 250, 250) };
+            contentHost = new Panel { Dock = DockStyle.Fill, BackColor = IsDarkMode ? Color.FromArgb(30, 30, 30) : Color.FromArgb(250, 250, 250) };
             this.Controls.Add(contentHost);
 
-            // 2. 加左侧导航栏（Left）
-            var leftNav = new Panel { Dock = DockStyle.Left, Width = 140, BackColor = Color.FromArgb(245, 245, 245) };
-            var leftLine = new Panel { Dock = DockStyle.Right, Width = 1, BackColor = Color.FromArgb(230, 230, 230) };
+            var leftNav = new Panel { Dock = DockStyle.Left, Width = 140, BackColor = IsDarkMode ? Color.FromArgb(37, 37, 38) : Color.FromArgb(245, 245, 245) };
+            var leftLine = new Panel { Dock = DockStyle.Right, Width = 1, BackColor = IsDarkMode ? Color.FromArgb(63, 63, 70) : Color.FromArgb(230, 230, 230) };
             leftNav.Controls.Add(leftLine);
 
             btnNavGeneral = CreateNavButton("常规设置", 10);
@@ -61,9 +58,8 @@ namespace Toolbox
             leftNav.Controls.Add(btnNavUpdate);
             this.Controls.Add(leftNav);
 
-            // 3. 加底部按钮栏（Bottom）
-            var bottomBar = new Panel { Dock = DockStyle.Bottom, Height = 56, BackColor = Color.FromArgb(250, 250, 250) };
-            var bottomLine = new Panel { Dock = DockStyle.Top, Height = 1, BackColor = Color.FromArgb(220, 220, 220) };
+            var bottomBar = new Panel { Dock = DockStyle.Bottom, Height = 56, BackColor = IsDarkMode ? Color.FromArgb(37, 37, 38) : Color.FromArgb(250, 250, 250) };
+            var bottomLine = new Panel { Dock = DockStyle.Top, Height = 1, BackColor = IsDarkMode ? Color.FromArgb(63, 63, 70) : Color.FromArgb(220, 220, 220) };
             bottomBar.Controls.Add(bottomLine);
 
             cancelBtn = new Button 
@@ -73,12 +69,12 @@ namespace Toolbox
                 Location = new Point(bottomBar.Width - 200, 12),
                 Anchor = AnchorStyles.Top | AnchorStyles.Right,
                 FlatStyle = FlatStyle.Flat, 
-                BackColor = Color.FromArgb(240, 240, 240), 
-                ForeColor = Color.FromArgb(60, 60, 60), 
+                BackColor = IsDarkMode ? Color.FromArgb(45, 45, 48) : Color.FromArgb(240, 240, 240), 
+                ForeColor = IsDarkMode ? Color.FromArgb(240, 240, 240) : Color.FromArgb(60, 60, 60), 
                 Font = new Font("微软雅黑", 9.5F),
-                DialogResult = DialogResult.Cancel // 保证底层关闭
+                DialogResult = DialogResult.Cancel
             };
-            cancelBtn.FlatAppearance.BorderColor = Color.FromArgb(200, 200, 200);
+            cancelBtn.FlatAppearance.BorderColor = IsDarkMode ? Color.FromArgb(63, 63, 70) : Color.FromArgb(200, 200, 200);
             cancelBtn.FlatAppearance.BorderSize = 1;
             
             saveBtn = new Button 
@@ -99,18 +95,17 @@ namespace Toolbox
             bottomBar.Controls.Add(saveBtn);
             this.Controls.Add(bottomBar);
 
-            // 4. 加标题栏（Top）
-            var titlePanel = new Panel { Dock = DockStyle.Top, Height = TitleBarHeight, BackColor = Color.FromArgb(240, 240, 240) };
-            var titleLabel = new Label { Text = "设置", Font = new Font("微软雅黑", 11F, FontStyle.Bold), ForeColor = Color.FromArgb(50, 50, 50), AutoSize = true, Location = new Point(16, 9), BackColor = Color.Transparent };
+            var titlePanel = new Panel { Dock = DockStyle.Top, Height = TitleBarHeight, BackColor = IsDarkMode ? Color.FromArgb(37, 37, 38) : Color.FromArgb(240, 240, 240) };
+            var titleLabel = new Label { Text = "设置", Font = new Font("微软雅黑", 11F, FontStyle.Bold), ForeColor = IsDarkMode ? Color.FromArgb(240, 240, 240) : Color.FromArgb(50, 50, 50), AutoSize = true, Location = new Point(16, 9), BackColor = Color.Transparent };
             titlePanel.Controls.Add(titleLabel);
 
-            var closeBtn = new Button { Text = "✕", FlatStyle = FlatStyle.Flat, Size = new Size(40, TitleBarHeight), Location = new Point(titlePanel.Width - 40, 0), Anchor = AnchorStyles.Top | AnchorStyles.Right, ForeColor = Color.FromArgb(80, 80, 80), BackColor = Color.FromArgb(240, 240, 240), TabStop = false, DialogResult = DialogResult.Cancel };
+            var closeBtn = new Button { Text = "✕", FlatStyle = FlatStyle.Flat, Size = new Size(40, TitleBarHeight), Location = new Point(titlePanel.Width - 40, 0), Anchor = AnchorStyles.Top | AnchorStyles.Right, ForeColor = IsDarkMode ? Color.FromArgb(240, 240, 240) : Color.FromArgb(80, 80, 80), BackColor = IsDarkMode ? Color.FromArgb(37, 37, 38) : Color.FromArgb(240, 240, 240), TabStop = false, DialogResult = DialogResult.Cancel };
             closeBtn.FlatAppearance.BorderSize = 0;
             closeBtn.MouseEnter += (s, e) => { closeBtn.BackColor = Color.FromArgb(232, 17, 35); closeBtn.ForeColor = Color.White; };
-            closeBtn.MouseLeave += (s, e) => { closeBtn.BackColor = Color.FromArgb(240, 240, 240); closeBtn.ForeColor = Color.FromArgb(80, 80, 80); };
+            closeBtn.MouseLeave += (s, e) => { closeBtn.BackColor = IsDarkMode ? Color.FromArgb(37, 37, 38) : Color.FromArgb(240, 240, 240); closeBtn.ForeColor = IsDarkMode ? Color.FromArgb(240, 240, 240) : Color.FromArgb(80, 80, 80); };
             titlePanel.Controls.Add(closeBtn);
 
-            var titleLine = new Panel { Dock = DockStyle.Bottom, Height = 1, BackColor = Color.FromArgb(220, 220, 220) };
+            var titleLine = new Panel { Dock = DockStyle.Bottom, Height = 1, BackColor = IsDarkMode ? Color.FromArgb(63, 63, 70) : Color.FromArgb(220, 220, 220) };
             titlePanel.Controls.Add(titleLine);
 
             titlePanel.MouseDown += TitleBar_MouseDown;
@@ -118,14 +113,13 @@ namespace Toolbox
             titleLine.MouseDown += TitleBar_MouseDown;
             this.Controls.Add(titlePanel);
 
-            // 构建具体页面
             BuildGeneralPanel();
             BuildUpdatePanel();
 
             this.Load += (s, e) => 
             {
                 ApplyWindowRegion();
-                SwitchPage("General"); // 默认显示常规设置
+                SwitchPage("General");
             };
             this.Resize += (s, e) => ApplyWindowRegion();
         }
@@ -134,24 +128,28 @@ namespace Toolbox
         {
             generalPanel = new Panel { Dock = DockStyle.Fill, Padding = new Padding(20), Visible = false };
             
-            var lblTheme = new Label { Text = "界面主题:", Location = new Point(20, 30), AutoSize = true, Font = new Font("微软雅黑", 9.5F), ForeColor = Color.FromArgb(140, 140, 140) };
-            themeCombo = new ComboBox { Location = new Point(120, 27), Width = 200, DropDownStyle = ComboBoxStyle.DropDownList, Font = new Font("微软雅黑", 9.5F), Enabled = false };
-            themeCombo.Items.AddRange(new object[] { "亮色 (开发中)" });
+            var lblTheme = new Label { Text = "界面主题:", Location = new Point(20, 30), AutoSize = true, Font = new Font("微软雅黑", 9.5F), ForeColor = IsDarkMode ? Color.FromArgb(160, 160, 160) : Color.FromArgb(140, 140, 140) };
+            themeCombo = new ComboBox { Location = new Point(120, 27), Width = 200, DropDownStyle = ComboBoxStyle.DropDownList, Font = new Font("微软雅黑", 9.5F) };
+            themeCombo.Items.AddRange(new object[] { "亮色", "暗色" });
             
-            autoStartCheck = new CheckBox { Text = "开机自动启动", Location = new Point(20, 80), AutoSize = true, Font = new Font("微软雅黑", 9.5F) };
+            autoStartCheck = new CheckBox { Text = "开机自动启动", Location = new Point(20, 80), AutoSize = true, Font = new Font("微软雅黑", 9.5F), ForeColor = IsDarkMode ? Color.FromArgb(240, 240, 240) : Color.FromArgb(60, 60, 60) };
             
-            startMinCheck = new CheckBox { Text = "启用系统托盘 (关闭时最小化到托盘)", Location = new Point(20, 120), AutoSize = true, Font = new Font("微软雅黑", 9.5F) };
+            startMinCheck = new CheckBox { Text = "启用系统托盘 (关闭时最小化到托盘)", Location = new Point(20, 120), AutoSize = true, Font = new Font("微软雅黑", 9.5F), ForeColor = IsDarkMode ? Color.FromArgb(240, 240, 240) : Color.FromArgb(60, 60, 60) };
             var lblTrayTip = new Label { Text = "注：开启/关闭托盘需重启软件生效", Location = new Point(40, 145), AutoSize = true, Font = new Font("微软雅黑", 8.5F), ForeColor = Color.Gray };
 
-            generalPanel.Controls.AddRange(new Control[] { lblTheme, themeCombo, autoStartCheck, startMinCheck, lblTrayTip });
+            // 新增：垂直同步设置
+            vsyncCheck = new CheckBox { Text = "启用垂直同步 (修复硬件信息滚动撕裂)", Location = new Point(20, 180), AutoSize = true, Font = new Font("微软雅黑", 9.5F), ForeColor = IsDarkMode ? Color.FromArgb(240, 240, 240) : Color.FromArgb(60, 60, 60) };
+            var lblVSyncTip = new Label { Text = "注：若硬件页面滚动出现闪烁，请关闭此项。需重启软件生效", Location = new Point(40, 205), AutoSize = true, Font = new Font("微软雅黑", 8.5F), ForeColor = Color.Gray };
+
+            generalPanel.Controls.AddRange(new Control[] { lblTheme, themeCombo, autoStartCheck, startMinCheck, lblTrayTip, vsyncCheck, lblVSyncTip });
         }
 
         private void BuildUpdatePanel()
         {
             updatePanel = new Panel { Dock = DockStyle.Fill, Padding = new Padding(20), Visible = false };
             
-            var titleUpdate = new Label { Text = "检查更新", Font = new Font("微软雅黑", 16F, FontStyle.Bold), ForeColor = Color.FromArgb(50, 50, 50), AutoSize = true, Location = new Point(20, 30) };
-            var curVersion = new Label { Text = "当前版本：v0.4.0", Font = new Font("微软雅黑", 10F), ForeColor = Color.FromArgb(100, 100, 100), AutoSize = true, Location = new Point(20, 80) };
+            var titleUpdate = new Label { Text = "检查更新", Font = new Font("微软雅黑", 16F, FontStyle.Bold), ForeColor = IsDarkMode ? Color.FromArgb(240, 240, 240) : Color.FromArgb(50, 50, 50), AutoSize = true, Location = new Point(20, 30) };
+            var curVersion = new Label { Text = "当前版本：v0.5.3", Font = new Font("微软雅黑", 10F), ForeColor = IsDarkMode ? Color.FromArgb(160, 160, 160) : Color.FromArgb(100, 100, 100), AutoSize = true, Location = new Point(20, 80) };
             
             var btnCheck = new Button
             {
@@ -177,8 +175,8 @@ namespace Toolbox
                 Size = new Size(140, 45),
                 Location = new Point(0, top),
                 FlatStyle = FlatStyle.Flat,
-                BackColor = Color.FromArgb(245, 245, 245),
-                ForeColor = Color.FromArgb(60, 60, 60),
+                BackColor = IsDarkMode ? Color.FromArgb(37, 37, 38) : Color.FromArgb(245, 245, 245),
+                ForeColor = IsDarkMode ? Color.FromArgb(240, 240, 240) : Color.FromArgb(60, 60, 60),
                 Font = new Font("微软雅黑", 10F),
                 TextAlign = ContentAlignment.MiddleLeft,
                 Padding = new Padding(15, 0, 0, 0),
@@ -190,18 +188,16 @@ namespace Toolbox
 
         private void SwitchPage(string pageName)
         {
-            // 重置导航按钮状态
-            btnNavGeneral.BackColor = Color.FromArgb(245, 245, 245);
-            btnNavGeneral.ForeColor = Color.FromArgb(60, 60, 60);
-            btnNavUpdate.BackColor = Color.FromArgb(245, 245, 245);
-            btnNavUpdate.ForeColor = Color.FromArgb(60, 60, 60);
+            btnNavGeneral.BackColor = IsDarkMode ? Color.FromArgb(37, 37, 38) : Color.FromArgb(245, 245, 245);
+            btnNavGeneral.ForeColor = IsDarkMode ? Color.FromArgb(240, 240, 240) : Color.FromArgb(60, 60, 60);
+            btnNavUpdate.BackColor = IsDarkMode ? Color.FromArgb(37, 37, 38) : Color.FromArgb(245, 245, 245);
+            btnNavUpdate.ForeColor = IsDarkMode ? Color.FromArgb(240, 240, 240) : Color.FromArgb(60, 60, 60);
 
-            // 清空内容区
             contentHost.Controls.Clear();
 
             if (pageName == "General")
             {
-                btnNavGeneral.BackColor = Color.FromArgb(250, 250, 250);
+                btnNavGeneral.BackColor = IsDarkMode ? Color.FromArgb(30, 30, 30) : Color.FromArgb(250, 250, 250);
                 btnNavGeneral.ForeColor = Color.FromArgb(0, 120, 215);
                 
                 generalPanel.Visible = true;
@@ -209,7 +205,7 @@ namespace Toolbox
             }
             else if (pageName == "Update")
             {
-                btnNavUpdate.BackColor = Color.FromArgb(250, 250, 250);
+                btnNavUpdate.BackColor = IsDarkMode ? Color.FromArgb(30, 30, 30) : Color.FromArgb(250, 250, 250);
                 btnNavUpdate.ForeColor = Color.FromArgb(0, 120, 215);
                 
                 updatePanel.Visible = true;
@@ -219,39 +215,39 @@ namespace Toolbox
 
         protected override void OnFormClosing(FormClosingEventArgs e)
         {
-            // 如果是保存点出去的，直接放行
             if (this.DialogResult == DialogResult.OK)
             {
                 base.OnFormClosing(e);
                 return;
             }
 
-            // 只有当用户在【常规设置】页，且修改了东西，才拦截
             if (contentHost.Controls.Contains(generalPanel) && HasUnsavedChanges())
             {
                 var result = MessageBox.Show("您有未保存的修改，确定要放弃吗？", "提示", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
                 if (result == DialogResult.No)
                 {
-                    e.Cancel = true; // 拦截，留在页面
+                    e.Cancel = true; 
                     return;
                 }
             }
             
-            // 确认放弃，赋予 Cancel 状态放行
             this.DialogResult = DialogResult.Cancel;
             base.OnFormClosing(e);
         }
 
         private bool HasUnsavedChanges()
         {
+            string selectedTheme = themeCombo.SelectedIndex == 1 ? "Dark" : "Light";
             return autoStartCheck.Checked != settings.AutoStart ||
-                   startMinCheck.Checked != settings.StartMinimized;
+                   startMinCheck.Checked != settings.StartMinimized ||
+                   selectedTheme != settings.Theme ||
+                   vsyncCheck.Checked != settings.EnableVSync;
         }
 
         protected override void OnPaint(PaintEventArgs e)
         {
             base.OnPaint(e);
-            using var pen = new Pen(Color.FromArgb(200, 200, 200), 1);
+            using var pen = new Pen(IsDarkMode ? Color.FromArgb(63, 63, 70) : Color.FromArgb(200, 200, 200), 1);
             e.Graphics.DrawRectangle(pen, 0, 0, this.Width - 1, this.Height - 1);
         }
 
@@ -273,15 +269,18 @@ namespace Toolbox
 
         private void LoadSettingsToUI()
         {
-            themeCombo.SelectedIndex = 0;
+            themeCombo.SelectedIndex = settings.Theme == "Dark" ? 1 : 0;
             autoStartCheck.Checked = settings.AutoStart;
             startMinCheck.Checked = settings.StartMinimized;
+            vsyncCheck.Checked = settings.EnableVSync;
         }
 
         private void SaveBtn_Click(object? sender, EventArgs e)
         {
+            settings.Theme = themeCombo.SelectedIndex == 1 ? "Dark" : "Light";
             settings.AutoStart = autoStartCheck.Checked;
             settings.StartMinimized = startMinCheck.Checked;
+            settings.EnableVSync = vsyncCheck.Checked;
             
             settings.Save();
 

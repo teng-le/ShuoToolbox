@@ -9,6 +9,7 @@ namespace Toolbox
         public bool AutoStart { get; set; } = false;
         public bool StartMinimized { get; set; } = false;
         public bool CheckForUpdates { get; set; } = true;
+        public bool EnableVSync { get; set; } = false; // 垂直同步，默认关闭
 
         private static readonly string SettingsPath = Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "settings.json");
 
